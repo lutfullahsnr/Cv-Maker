@@ -151,17 +151,6 @@ app.post('/api/generate-pdf', (req, res) => {
   }
 });
 
-// Şablon Kaydetme
-app.post('/api/save-template', (req, res) => {
-  try {
-    if (!fs.existsSync('templates')) fs.mkdirSync('templates');
-    const filename = `cv-template-${Date.now()}.json`;
-    fs.writeFileSync(path.join('templates', filename), JSON.stringify(req.body, null, 2));
-    res.json({ success: true, message: filename });
-  } catch (error) {
-    res.status(500).json({ error: 'Kaydetme başarısız' });
-  }
-});
 
 app.listen(PORT, () => {
   console.log(`\n🚀 ATS CV Sunucusu Çalışıyor: http://localhost:${PORT}`);

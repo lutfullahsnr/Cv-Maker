@@ -21,10 +21,8 @@
         input, textarea { width: 100%; padding: 15px; border: 2px solid #ecf0f1; border-radius: 10px; font-size: 16px; transition: all 0.3s; }
         input:focus, textarea:focus { border-color: #3498db; outline: none; box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1); transform: translateY(-2px); }
         .experience-item, .education-item { background: linear-gradient(135deg, #f8f9fa, #e9ecef); padding: 25px; margin-bottom: 20px; border-radius: 12px; border-left: 5px solid #3498db; box-shadow: 0 3px 10px rgba(0,0,0,0.1); }
-        .skills-container { display: flex; flex-direction: column; gap: 15px; }
         button { background: linear-gradient(135deg, #3498db, #2980b9); color: white; border: none; padding: 15px 30px; border-radius: 10px; cursor: pointer; font-size: 16px; font-weight: bold; margin: 10px 5px 0 0; transition: all 0.3s; box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3); }
         button:hover { transform: translateY(-3px); box-shadow: 0 6px 20px rgba(52, 152, 219, 0.4); }
-        .save-btn { background: linear-gradient(135deg, #27ae60, #229954); }
         .pdf-btn { background: linear-gradient(135deg, #e74c3c, #c0392b); font-size: 18px; padding: 18px 40px; }
         .actions { text-align: center; margin-top: 40px; background: white; padding: 40px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
         @media (max-width: 768px) { .form-grid { grid-template-columns: 1fr; } header h1 { font-size: 2em; } }
@@ -60,15 +58,17 @@
             });
 
             const updateField = (section, index, field, value) => {
-                const newData = JSON.parse(JSON.stringify(cvData));
-                newData[section][index][field] = value;
+                const newData = { ...cvData };
+                newData[section] = [...newData[section]];
+                newData[section][index] = { ...newData[section][index], [field]: value };
                 setCvData(newData);
             };
 
             const updatePersonal = (field, value) => {
-                const newData = JSON.parse(JSON.stringify(cvData));
-                newData.personal[field] = value;
-                setCvData(newData);
+                setCvData({
+                    ...cvData,
+                    personal: { ...cvData.personal, [field]: value }
+                });
             };
 
             const updateSkill = (index, value) => {
@@ -101,19 +101,6 @@
                 }
             };
 
-            const saveTemplate = async () => {
-                try {
-                    await fetch('/api/save-template', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(cvData)
-                    });
-                    alert('✅ Şablon kaydedildi!');
-                } catch (error) {
-                    alert('💾 Kaydetme hatası');
-                }
-            };
-
             return React.createElement('div', { className: 'cv-builder' },
                 React.createElement('header', null,
                     React.createElement('h1', null, '🎯 ATS Uyumlu CV Oluşturucu'),
@@ -123,32 +110,14 @@
                     React.createElement('section', null,
                         React.createElement('h2', null, '📋 Kişisel Bilgiler'),
                         React.createElement('div', { className: 'form-grid' },
-                            React.createElement('input', {
-                                placeholder: 'Ad Soyad *',
-                                value: cvData.personal.name,
-                                onChange: (e) => updatePersonal('name', e.target.value)
-                            }),
-                            React.createElement('input', {
-                                placeholder: 'Pozisyon Ünvanı *',
-                                value: cvData.personal.title,
-                                onChange: (e) => updatePersonal('title', e.target.value)
-                            }),
-                            React.createElement('input', {
-                                placeholder: 'Email *',
-                                type: 'email',
-                                value: cvData.personal.email,
-                                onChange: (e) => updatePersonal('email', e.target.value)
-                            }),
-                            React.createElement('input', {
-                                placeholder: 'Telefon',
-                                value: cvData.personal.phone,
-                                onChange: (e) => updatePersonal('phone', e.target.value)
-                            }),
-                            React.createElement('input', {
-                                placeholder: 'LinkedIn (opsiyonel)',
-                                value: cvData.personal.linkedin,
-                                onChange: (e) => updatePersonal('linkedin', e.target.value)
-                            })
+                            ['name', 'title', 'email', 'phone', 'linkedin'].map((field) => 
+                                React.createElement('input', {
+                                    key: field,
+                                    placeholder: field === 'name' ? 'Ad Soyad *' : field === 'title' ? 'Pozisyon Ünvanı *' : field === 'email' ? 'Email *' : field.charAt(0).toUpperCase() + field.slice(1),
+                                    value: cvData.personal[field],
+                                    onChange: (e) => updatePersonal(field, e.target.value)
+                                })
+                            )
                         )
                     ),
                     React.createElement('section', null,
@@ -209,7 +178,7 @@
                             cvData.skills.map((skill, index) =>
                                 React.createElement('input', {
                                     key: index,
-                                    placeholder: `Beceri ${index + 1} (React, Python, SQL...)`,
+                                    placeholder: `Beceri ${index + 1}`,
                                     value: skill,
                                     onChange: (e) => updateSkill(index, e.target.value)
                                 })
@@ -219,8 +188,7 @@
                     )
                 ),
                 React.createElement('div', { className: 'actions' },
-                    React.createElement('button', { className: 'pdf-btn', onClick: generatePDF }, '📄 PDF İNDİR'),
-                    React.createElement('button', { className: 'save-btn', onClick: saveTemplate }, '💾 ŞABLON KAYDET')
+                    React.createElement('button', { className: 'pdf-btn', onClick: generatePDF }, '📄 PDF İNDİR')
                 )
             );
         }
