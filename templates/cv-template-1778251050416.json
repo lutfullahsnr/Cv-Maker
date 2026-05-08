@@ -1,0 +1,41 @@
+{
+  "personal": {
+    "name": "Lütfullah Şener",
+    "title": "",
+    "email": "lutfullahsener06@gmail.com",
+    "phone": "05467656033",
+    "linkedin": ""
+  },
+  "experience": [
+    {
+      "title": "Unity Developer",
+      "company": "Miu Games",
+      "duration": "Aralık 2024 - Aralık 2025",
+      "description": "• War Sort: Projenin tek geliştiricisi (Sole Developer) olarak ilk oynanabilir sürümü (MVP) sıfırdan tasarlayıp başarıyla teslim ettim. Karmaşık dizilim algoritmaları gerektiren Grid tabanlı sistem mimarisini kurdum.\n  Seviye tasarım süreçlerini hızlandırmak ve dinamik hale getirmek amacıyla projeye özel bir Level Editor (Seviye Editörü) kodladım.\n  Derinlemesine profiling yaparak oyunun darboğazlarını tespit ettim; eski nesil mobil cihazlarda 4-5 FPS olan performansı, yaptığım bellek ve render optimizasyonlarıyla 25-30 FPS bandına çıkararak %500'ün üzerinde bir performans artışı sağladım.\n• Chef's Journey: Kullanıcı deneyimini (UX) merkeze alan UI sistemlerini entegre ettim. DOTween kütüphanesini kullanarak, hamburger hazırlama mekanikleri için akıcı, yüksek performanslı ve geri bildirimi yüksek animasyon sistemleri geliştirdim.\n• Parolla & AlfaPetek Projeleri: Kurumsal oryantasyon süreçleri için tamamen özelleştirilebilir bilgi yarışması platformlarını tek geliştirici (Sole Developer) olarak uçtan uca tasarladım ve yayına aldım.\n  Bu projeler için Admin Paneli ve Oyun Paneli içeren çift yönlü bir full-stack web mimarisi kurdum. Arka uç (back-end) geliştirme süreçlerini proaktif bir şekilde öğrenerek, Firebase NoSQL üzerinden oyun içi verilerin (avatar, soru, kategori) gerçek zamanlı ve gecikmesiz senkronizasyonunu sağladım.\n"
+    },
+    {
+      "title": "Game Developer & Co-Founder",
+      "company": "Bağımsız Oyun Projesi",
+      "duration": "2025 - Devam Ediyor",
+      "description": "Mobil platformlar (Google Play Store) için, ışık tabanlı mekaniklere ve şehirleri aydınlatma progresyonuna sahip, yenilikçi bir labirent/bulmaca oyunu geliştirmekteyim.\nProjenin temel oyun döngüsünü (game loop), veri yönetimini ve mobil cihazlar için performans optimizasyonlarını C# ile sıfırdan inşa ettim.\nOyunun 2 ay içerisinde tüm alfa/beta testleri tamamlanarak global ölçekte Google Play Store'da yayınlanması planlanmaktadır"
+    }
+  ],
+  "education": [
+    {
+      "degree": "Bilgisayar Mühendisliği - Lisans ",
+      "institution": "Karabük Üniversitesi",
+      "year": "2022 - 2027(Beklenen)"
+    },
+    {
+      "degree": "Scholar",
+      "institution": "Google Oyun ve Uygulama Akademisi",
+      "year": "2023-2024 "
+    }
+  ],
+  "skills": [
+    "Unity (2D/3D), C#, URP, DOTween, Object Pooling",
+    "Mobile Performance Optimization, Memory Profiling, Grid Systems",
+    "Firebase (NoSQL), Full-Stack Integration, SQLite",
+    "Agile Methodologies, Project Management, UI/UX Implementation"
+  ]
+}

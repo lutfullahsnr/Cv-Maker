@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ATS CV Oluşturucu</title>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 20px; }
+        .cv-builder { max-width: 1000px; margin: 0 auto; }
+        header { text-align: center; background: white; padding: 40px 30px; border-radius: 15px; margin-bottom: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
+        header h1 { color: #2c3e50; font-size: 2.5em; margin-bottom: 10px; }
+        header p { color: #7f8c8d; font-size: 1.2em; }
+        .cv-form { display: grid; gap: 25px; }
+        section { background: white; padding: 30px; border-radius: 15px; box-shadow: 0 5px 20px rgba(0,0,0,0.1); }
+        section h2 { color: #2c3e50; margin-bottom: 25px; font-size: 1.5em; border-bottom: 3px solid #3498db; padding-bottom: 10px; }
+        .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
+        input, textarea { width: 100%; padding: 15px; border: 2px solid #ecf0f1; border-radius: 10px; font-size: 16px; transition: all 0.3s; }
+        input:focus, textarea:focus { border-color: #3498db; outline: none; box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1); transform: translateY(-2px); }
+        .experience-item, .education-item { background: linear-gradient(135deg, #f8f9fa, #e9ecef); padding: 25px; margin-bottom: 20px; border-radius: 12px; border-left: 5px solid #3498db; box-shadow: 0 3px 10px rgba(0,0,0,0.1); }
+        .skills-container { display: flex; flex-direction: column; gap: 15px; }
+        button { background: linear-gradient(135deg, #3498db, #2980b9); color: white; border: none; padding: 15px 30px; border-radius: 10px; cursor: pointer; font-size: 16px; font-weight: bold; margin: 10px 5px 0 0; transition: all 0.3s; box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3); }
+        button:hover { transform: translateY(-3px); box-shadow: 0 6px 20px rgba(52, 152, 219, 0.4); }
+        .save-btn { background: linear-gradient(135deg, #27ae60, #229954); }
+        .pdf-btn { background: linear-gradient(135deg, #e74c3c, #c0392b); font-size: 18px; padding: 18px 40px; }
+        .actions { text-align: center; margin-top: 40px; background: white; padding: 40px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
+        @media (max-width: 768px) { .form-grid { grid-template-columns: 1fr; } header h1 { font-size: 2em; } }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState } = React;
+
+        function CVBuilder() {
+            const [cvData, setCvData] = useState({
+                personal: { name: '', title: '', email: '', phone: '', linkedin: '' },
+                experience: [{ title: '', company: '', duration: '', description: '' }],
+                education: [{ degree: '', institution: '', year: '' }],
+                skills: ['']
+            });
+
+            const addExperience = () => setCvData({
+                ...cvData,
+                experience: [...cvData.experience, { title: '', company: '', duration: '', description: '' }]
+            });
+
+            const addEducation = () => setCvData({
+                ...cvData,
+                education: [...cvData.education, { degree: '', institution: '', year: '' }]
+            });
+
+            const addSkill = () => setCvData({
+                ...cvData,
+                skills: [...cvData.skills, '']
+            });
+
+            const updateField = (section, index, field, value) => {
+                const newData = JSON.parse(JSON.stringify(cvData));
+                newData[section][index][field] = value;
+                setCvData(newData);
+            };
+
+            const updatePersonal = (field, value) => {
+                const newData = JSON.parse(JSON.stringify(cvData));
+                newData.personal[field] = value;
+                setCvData(newData);
+            };
+
+            const updateSkill = (index, value) => {
+                const newSkills = [...cvData.skills];
+                newSkills[index] = value;
+                setCvData({ ...cvData, skills: newSkills });
+            };
+
+            const generatePDF = async () => {
+                try {
+                    const response = await fetch('/api/generate-pdf', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(cvData)
+                    });
+                    
+                    if (response.ok) {
+                        const blob = await response.blob();
+                        const url = URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = 'ATS-CV.pdf';
+                        a.click();
+                        URL.revokeObjectURL(url);
+                    } else {
+                        alert('PDF oluşturulamadı');
+                    }
+                } catch (error) {
+                    alert('Hata: ' + error.message);
+                }
+            };
+
+            const saveTemplate = async () => {
+                try {
+                    await fetch('/api/save-template', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(cvData)
+                    });
+                    alert('✅ Şablon kaydedildi!');
+                } catch (error) {
+                    alert('💾 Kaydetme hatası');
+                }
+            };
+
+            return React.createElement('div', { className: 'cv-builder' },
+                React.createElement('header', null,
+                    React.createElement('h1', null, '🎯 ATS Uyumlu CV Oluşturucu'),
+                    React.createElement('p', null, 'Temiz • Parsable • Emoji Yok • PDF Export')
+                ),
+                React.createElement('div', { className: 'cv-form' },
+                    React.createElement('section', null,
+                        React.createElement('h2', null, '📋 Kişisel Bilgiler'),
+                        React.createElement('div', { className: 'form-grid' },
+                            React.createElement('input', {
+                                placeholder: 'Ad Soyad *',
+                                value: cvData.personal.name,
+                                onChange: (e) => updatePersonal('name', e.target.value)
+                            }),
+                            React.createElement('input', {
+                                placeholder: 'Pozisyon Ünvanı *',
+                                value: cvData.personal.title,
+                                onChange: (e) => updatePersonal('title', e.target.value)
+                            }),
+                            React.createElement('input', {
+                                placeholder: 'Email *',
+                                type: 'email',
+                                value: cvData.personal.email,
+                                onChange: (e) => updatePersonal('email', e.target.value)
+                            }),
+                            React.createElement('input', {
+                                placeholder: 'Telefon',
+                                value: cvData.personal.phone,
+                                onChange: (e) => updatePersonal('phone', e.target.value)
+                            }),
+                            React.createElement('input', {
+                                placeholder: 'LinkedIn (opsiyonel)',
+                                value: cvData.personal.linkedin,
+                                onChange: (e) => updatePersonal('linkedin', e.target.value)
+                            })
+                        )
+                    ),
+                    React.createElement('section', null,
+                        React.createElement('h2', null, '💼 Deneyim'),
+                        cvData.experience.map((exp, index) =>
+                            React.createElement('div', { key: index, className: 'experience-item' },
+                                React.createElement('input', {
+                                    placeholder: 'Pozisyon Adı',
+                                    value: exp.title,
+                                    onChange: (e) => updateField('experience', index, 'title', e.target.value)
+                                }),
+                                React.createElement('input', {
+                                    placeholder: 'Şirket Adı',
+                                    value: exp.company,
+                                    onChange: (e) => updateField('experience', index, 'company', e.target.value)
+                                }),
+                                React.createElement('input', {
+                                    placeholder: 'Tarih (2020-2023)',
+                                    value: exp.duration,
+                                    onChange: (e) => updateField('experience', index, 'duration', e.target.value)
+                                }),
+                                React.createElement('textarea', {
+                                    placeholder: 'Görev ve başarılarınız...',
+                                    value: exp.description,
+                                    onChange: (e) => updateField('experience', index, 'description', e.target.value),
+                                    rows: '3'
+                                })
+                            )
+                        ),
+                        React.createElement('button', { type: 'button', onClick: addExperience }, '+ Deneyim Ekle')
+                    ),
+                    React.createElement('section', null,
+                        React.createElement('h2', null, '🎓 Eğitim'),
+                        cvData.education.map((edu, index) =>
+                            React.createElement('div', { key: index, className: 'education-item' },
+                                React.createElement('input', {
+                                    placeholder: 'Derece (Lisans, Yüksek Lisans)',
+                                    value: edu.degree,
+                                    onChange: (e) => updateField('education', index, 'degree', e.target.value)
+                                }),
+                                React.createElement('input', {
+                                    placeholder: 'Üniversite / Kurum',
+                                    value: edu.institution,
+                                    onChange: (e) => updateField('education', index, 'institution', e.target.value)
+                                }),
+                                React.createElement('input', {
+                                    placeholder: 'Yıl (2016-2020)',
+                                    value: edu.year,
+                                    onChange: (e) => updateField('education', index, 'year', e.target.value)
+                                })
+                            )
+                        ),
+                        React.createElement('button', { type: 'button', onClick: addEducation }, '+ Eğitim Ekle')
+                    ),
+                    React.createElement('section', null,
+                        React.createElement('h2', null, '🛠️ Beceriler'),
+                        React.createElement('div', { className: 'form-grid' },
+                            cvData.skills.map((skill, index) =>
+                                React.createElement('input', {
+                                    key: index,
+                                    placeholder: `Beceri ${index + 1} (React, Python, SQL...)`,
+                                    value: skill,
+                                    onChange: (e) => updateSkill(index, e.target.value)
+                                })
+                            )
+                        ),
+                        React.createElement('button', { type: 'button', onClick: addSkill }, '+ Beceri Ekle')
+                    )
+                ),
+                React.createElement('div', { className: 'actions' },
+                    React.createElement('button', { className: 'pdf-btn', onClick: generatePDF }, '📄 PDF İNDİR'),
+                    React.createElement('button', { className: 'save-btn', onClick: saveTemplate }, '💾 ŞABLON KAYDET')
+                )
+            );
+        }
+
+        ReactDOM.render(React.createElement(CVBuilder), document.getElementById('root'));
+    </script>
+</body>
+</html>
