@@ -132,12 +132,20 @@ app.post('/api/generate-pdf', (req, res) => {
     const pages = doc.bufferedPageRange();
     for (let i = 0; i < pages.count; i++) {
       doc.switchToPage(i);
+      
+      // ÇÖZÜM: Yeni sayfa açmasını engellemek için alt boşluğu geçici olarak sıfırlıyoruz
+      const oldBottomMargin = doc.page.margins.bottom;
+      doc.page.margins.bottom = 0;
+
       doc.fontSize(8).fillColor('#95a5a6').text(
         `Sayfa ${i + 1} / ${pages.count}`,
         50,
         810,
-        { align: 'center' }
+        { align: 'center', width: 495 }
       );
+      
+      // İşlem bitince marjini eski haline getiriyoruz
+      doc.page.margins.bottom = oldBottomMargin;
     }
 
     doc.end();
